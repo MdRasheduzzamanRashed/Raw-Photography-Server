@@ -40,9 +40,9 @@ async function run() {
     const packageCollection = client
       .db("rawPhotography")
       .collection("packages");
-    const bookingCollection = client
+    const categoriesCollection = client
       .db("rawPhotography")
-      .collection("bookings");
+      .collection("packageCategory");
 
     app.post("/jwt", (req, res) => {
       const user = req.body;
@@ -58,6 +58,12 @@ async function run() {
       const cursor = packageCollection.find(query);
       const packages = await cursor.toArray();
       res.send(packages);
+    });
+    app.get("/categories", async (req, res) => {
+      const query = {};
+      const cursor = categoriesCollection.find(query);
+      const categories = await cursor.toArray();
+      res.send(categories);
     });
 
     app.get("/packages/:id", async (req, res) => {
