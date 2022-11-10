@@ -43,6 +43,9 @@ async function run() {
     const categoriesCollection = client
       .db("rawPhotography")
       .collection("packageCategory");
+    const bookingCollection = client
+      .db("rawPhotography")
+      .collection("bookings");
 
     app.post("/jwt", (req, res) => {
       const user = req.body;
