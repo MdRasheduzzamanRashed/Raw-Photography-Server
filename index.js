@@ -46,6 +46,7 @@ async function run() {
     const bookingCollection = client
       .db("rawPhotography")
       .collection("bookings");
+    const reviewsCollection = client.db("rawPhotography").collection("reviews");
 
     app.post("/jwt", (req, res) => {
       const user = req.body;
@@ -118,6 +119,49 @@ async function run() {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await bookingCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    // Review api
+    app.get("/reviews", verifyJWT, async (req, res) => {
+      const decoded = req.decoded;
+      if (decoded.email !== req.query.email) {
+        res.status(403).send({ message: "unauthorized access" });
+      }
+      let query = {};
+      if (req.query.email) {
+        query = {
+          email: req.query.email,
+        };
+      }
+      const cursor = reviewsCollection.find(query);
+      const bookings = await cursor.toArray();
+      res.send(bookings);
+    });
+
+    app.post("/reviews", verifyJWT, async (req, res) => {
+      const order = req.body;
+      const result = await reviewsCollection.insertOne(order);
+      res.send(result);
+    });
+
+    app.patch("/reviews/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const status = req.body.status;
+      const query = { _id: ObjectId(id) };
+      const updatedDoc = {
+        $set: {
+          status: status,
+        },
+      };
+      const result = await reviewsCollection.updateOne(query, updatedDoc);
+      res.send(result);
+    });
+
+    app.delete("/reviews/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await reviewsCollection.deleteOne(query);
       res.send(result);
     });
   } finally {
