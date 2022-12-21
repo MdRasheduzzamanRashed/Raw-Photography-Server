@@ -50,7 +50,6 @@ async function run() {
 
     app.post("/jwt", (req, res) => {
       const user = req.body;
-      console.log(user);
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "1d",
       });
@@ -138,7 +137,12 @@ async function run() {
       const bookings = await cursor.toArray();
       res.send(bookings);
     });
-
+    app.get("/ratings", async (req, res) => {
+      const name = req.query.name;
+      const query = { packageName: name };
+      const ratings = await reviewsCollection.find(query).toArray();
+      res.send(ratings);
+    });
     app.post("/reviews", verifyJWT, async (req, res) => {
       const order = req.body;
       const result = await reviewsCollection.insertOne(order);
